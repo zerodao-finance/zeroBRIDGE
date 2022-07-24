@@ -17,6 +17,10 @@ describe("getChainName function", () => {
     expect(getChainName("1")).toEqual("Mainnet");
   });
 
+  test("it should return Optimism for 10", () => {
+    expect(getChainName("10")).toEqual("Optimism");
+  });
+
   test("it should return Unknown Chain for null", () => {
     expect(getChainName(null)).toEqual("Unknown Chain");
   });

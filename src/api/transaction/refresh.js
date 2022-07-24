@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import * as React from "react";
 import { PersistanceStore } from "../storage/storage";
 import _ from "lodash";
 import async from "async";
-import {
-  UnderwriterTransferRequest,
-  UnderwriterBurnRequest,
-} from "zero-protocol/dist/lib/zero";
+import { UnderwriterTransferRequest } from "zero-protocol/dist/lib/zero";
+import { NotificationHelper } from "../notification/helper";
+import { useNotificationContext } from "../notification";
 
 export function usePersistanceRefresh(dispatch) {
-  let [initialState, setInitialState] = React.useState();
-  let queue = async.queue(function (task, callback) {
+  const { card, cardDispatch } = useNotificationContext();
+  const Notify = new NotificationHelper(card, cardDispatch);
+
+  let queue = async.queue((task, callback) => {
     callback(null, task);
   });
 
@@ -45,14 +46,19 @@ export function usePersistanceRefresh(dispatch) {
 
       let merged = _.merge(dataSettled, transformedData);
       if (!_.isEmpty(merged.pending.transfer)) {
-        getPendingRequestStatus(merged.pending.transfer, queue, dispatch);
+        getPendingRequestStatus(
+          merged.pending.transfer,
+          queue,
+          dispatch,
+          Notify
+        );
       }
       dispatch({ type: "INIT", payload: merged });
     }
   }, []);
 }
 
-export async function getPendingRequestStatus(array, queue, dispatch) {
+export function getPendingRequestStatus(array, queue, dispatch, Notify) {
   for (const i of array) {
     queue.push(i, callback);
   }
@@ -64,14 +70,10 @@ export async function getPendingRequestStatus(array, queue, dispatch) {
 
     const mint = await req.submitToRenVM();
 
-    if (process.env.REACT_APP_TEST) {
-      mint.on("deposit", async (deposit) => {
-        const confirmed = await deposit.confirmed();
-        confirmed.on("status");
-      });
-    } else {
-      mint.on("deposit", async (deposit) => {
-        if (deposit.depositDetails.transaction.confirmations === 6) {
+    mint.on("transaction", (transaction) => {
+      let forwarded = null;
+      transaction.in.wait().on("progress", (progress) => {
+        if (!forwarded && progress.confirmations >= 6) {
           dispatch({
             type: "COMPLETE",
             payload: {
@@ -81,22 +83,36 @@ export async function getPendingRequestStatus(array, queue, dispatch) {
             },
           });
           PersistanceStore.add_data(task.id, task, "completed");
-        }
-        await deposit.confirmed().on("confirmation", (confs, target) => {
-          if (confs >= target) {
-            //handle setting as confirmed
-            dispatch({
-              type: "COMPLETE",
+        } else {
+          if (!forwarded) {
+            const { id, dispatch } = Notify.createTXCard(true, task.type, {
+              hash: task.transactionHash,
+              confirmed: true,
+              data: task._data,
+              max: progress.target,
+              current:
+                progress.confirmations == 0 ? 0 : progress.confirmations + 1,
+            });
+            forwarded = { id: id, dispatch: dispatch };
+          } else if (progress.confirmations >= progress.target) {
+            forwarded.dispatch({
+              type: "REMOVE",
+              payload: { id: forwarded.id },
+            });
+          } else {
+            forwarded.dispatch({
+              type: "UPDATE",
               payload: {
-                type: task.type,
-                id: task.id,
-                data: task._data,
+                id: forwarded.id,
+                update: {
+                  max: progress.target,
+                  current: progress.confirmations + 1,
+                },
               },
             });
           }
-        });
-        await deposit.signed();
+        }
       });
-    }
+    });
   }
 }

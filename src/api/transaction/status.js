@@ -17,20 +17,20 @@ export const getStatus = (data) => {
     const signer = await getSigner(wallet);
     const mint = await req.submitToRenVM();
 
-    if (!process.env.REACT_APP_TEST) {
-      mint.on("deposit", async (deposit) => {
-        let confs = deposit.depositDetails.transaction.confirmations;
-
+    mint.on("transaction", (transaction) => {
+      transaction.in.wait().on("progress", (progress) => {
         let passedData = {
           target: 6,
-          confs: await confs,
+          confs: progress.confirmations,
           fallbackMint:
-            confs && confs > 6 ? () => fallbackMint(req, signer) : null,
+            progress.confirmations && progress.confirmations > 6
+              ? () => fallbackMint(req, signer)
+              : null,
         };
 
         setPassed(passedData);
       });
-    }
+    });
   }, []);
 
   return { passed };

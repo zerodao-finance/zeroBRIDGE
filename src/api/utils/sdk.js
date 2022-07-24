@@ -195,7 +195,7 @@ export class sdkTransfer {
         pNonce: self.getPNonce(address, timestamp), // Deterministic recovery mechanism
         data, // minOut
         contractAddress: contracts.ZeroController.address, // BadgerBridgeZeroController.address on mainnet/arbitrum
-        chainId: self.chainId, // "1" or "42161" TODO: MATIC
+        chainId: self.chainId, // any of the available chainIds
         signature: "", // Currently not used
       });
       req.dry = async () => [];
@@ -222,7 +222,7 @@ export class sdkTransfer {
     try {
       await this.zeroUser.publishTransferRequest(transferRequest);
 
-      const mint = await transferRequest.submitToRenVM();
+      const mint = await transferRequest.submitToRenVM(); // In renjsv3, this is really called a gateway
       var gatewayAddress = await transferRequest.toGatewayAddress();
 
       this.response.emit("published", {

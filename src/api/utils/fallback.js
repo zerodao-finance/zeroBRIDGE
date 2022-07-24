@@ -15,6 +15,8 @@ const getRenBTCAddress = async (signer) => {
           return "MATIC";
         case 43114:
           return "AVALANCHE";
+        case 10:
+          return "OPTIMISM";
       }
     })()
   ].renBTC;

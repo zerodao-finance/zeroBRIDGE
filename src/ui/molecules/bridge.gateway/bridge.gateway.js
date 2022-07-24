@@ -1,7 +1,4 @@
-import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import { ethers } from "ethers";
-import { BridgeLoadingGateway } from "./bridge.loading.gateway";
-import { useBridgePage } from "../../../api/global/interfaces/interface.bridge";
 import { BitcoinQR } from "../../atoms/helpers/BitcoinQR";
 
 export const BridgeGatewayConfirmation = ({

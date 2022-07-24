@@ -74,30 +74,6 @@ export class NotificationHelper {
     }, 500);
   }
 
-  async _confirmation(id, data) {
-    await data.deposit.confirmed().on("confirmation", (confs, target) => {
-      if (confs >= target) {
-        this._removeId(id);
-        return;
-      } else {
-        this.dispatch({
-          type: "UPDATE",
-          payload: { id: id, update: { max: target, current: confs + 1 } },
-        });
-      }
-    });
-    data.on("confirmation", (i, target) => {
-      if (i >= target) {
-        this._removeId(id);
-        return;
-      } else {
-        this.dispatch({
-          type: "UPDATE",
-          payload: { id: id, update: { max: target, current: i + 1 } },
-        });
-      }
-    });
-  }
   _close(id) {
     this._removeId(id);
   }

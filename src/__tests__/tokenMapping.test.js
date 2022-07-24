@@ -18,6 +18,10 @@ describe("selectFixture function", () => {
     expect(selectFixture("1")).toEqual(fixtures.ETHEREUM);
   });
 
+  test("it should return fixtures.OPTIMISM for 10", () => {
+    expect(selectFixture("10")).toEqual(fixtures.ETHEREUM);
+  });
+
   test("it should return fixtures.ETHEREUM for null", () => {
     expect(selectFixture(null)).toEqual(fixtures.ETHEREUM);
   });
@@ -104,14 +108,59 @@ describe("tokenMapping function", () => {
     );
   });
 
-  test("it should return fixtures.ETHEREUM.renBTC for 1 and RENBTC or renbtc", () => {
+  test("it should return fixtures.OPTIMISM.renBTC for 10 and RENBTC or renbtc", () => {
     tokenName = "RENBTC";
     expect(tokenMapping({ tokenName, chainId })).toEqual(
-      fixtures.ETHEREUM.renBTC
+      fixtures.OPTIMISM.renBTC
     );
     tokenName = "renbtc";
     expect(tokenMapping({ tokenName, chainId })).toEqual(
-      fixtures.ETHEREUM.renBTC
+      fixtures.OPTIMISM.renBTC
+    );
+  });
+
+  test("it should return fixtures.OPTIMISM.USDC for 10 and USDC or usdc", () => {
+    chainId = "10";
+    tokenName = "USDC";
+    expect(tokenMapping({ tokenName, chainId })).toEqual(
+      fixtures.OPTIMISM.USDC
+    );
+    tokenName = "usdc";
+    expect(tokenMapping({ tokenName, chainId })).toEqual(
+      fixtures.OPTIMISM.USDC
+    );
+  });
+
+  test("it should return fixtures.OPTIMISM.ibBTC for 10 and IBBTC or ibbtc", () => {
+    tokenName = "IbBTC";
+    expect(tokenMapping({ tokenName, chainId })).toEqual(
+      fixtures.OPTIMISM.ibBTC
+    );
+    tokenName = "ibbtc";
+    expect(tokenMapping({ tokenName, chainId })).toEqual(
+      fixtures.OPTIMISM.ibBTC
+    );
+  });
+
+  test("it should return fixtures.OPTIMISM.WBTC for 10 and WBTC or wbtc", () => {
+    tokenName = "WBTC";
+    expect(tokenMapping({ tokenName, chainId })).toEqual(
+      fixtures.OPTIMISM.WBTC
+    );
+    tokenName = "wbtc";
+    expect(tokenMapping({ tokenName, chainId })).toEqual(
+      fixtures.OPTIMISM.WBTC
+    );
+  });
+
+  test("it should return fixtures.OPTIMISM.renBTC for 10 and RENBTC or renbtc", () => {
+    tokenName = "RENBTC";
+    expect(tokenMapping({ tokenName, chainId })).toEqual(
+      fixtures.OPTIMISM.renBTC
+    );
+    tokenName = "renbtc";
+    expect(tokenMapping({ tokenName, chainId })).toEqual(
+      fixtures.OPTIMISM.renBTC
     );
   });
 });

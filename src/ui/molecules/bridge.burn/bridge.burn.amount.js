@@ -82,7 +82,7 @@ export const BridgeBurnInput = ({
               tokensRemoved={[
                 "BTC",
                 ...REMOVED_TOKENS[
-                  available_chains.includes(chainId) ? chainId : 1
+                  available_chains.includes(Number(chainId)) ? chainId : 1
                 ],
               ]}
               tokensDisabled={["ibBTC"]}

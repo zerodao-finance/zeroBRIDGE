@@ -22,13 +22,17 @@ const chains = [
     name: "Arbitrum",
     chainId: "42161",
   },
-  {
-    name: "Avalanche",
-    chainId: "43114",
-  },
+  // {
+  //   name: "Avalanche",
+  //   chainId: "43114",
+  // },
   {
     name: "Polygon",
     chainId: "137",
+  },
+  {
+    name: "Optimism",
+    chainId: "10",
   },
 ];
 
